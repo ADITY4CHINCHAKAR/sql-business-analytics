@@ -1,8 +1,3 @@
-/* DAY - 15 */
-
--------------------------------------------------------------------------------
-
-------------------------------------------------------------------------
 
 /*1. name, city
 2. recency_days — days since last delivered order (CURRENT_DATE - MAX(order_date)). No orders = 9999.
@@ -94,7 +89,7 @@ SELECT
 FROM RFM_SEGMENT
 GROUP BY 1
 
-/*💬 Priya:
+/*
 "For each signup month cohort: how many customers joined, how many ordered in Month 0 (same month as signup), 
 Month 1 (next month), Month 2, Month 3? Show both counts and retention percentages."
 Cohort analysis: signup_month, cohort_size, month_0_orders, month_1_orders, month_2_orders, with retention % for each.*/
@@ -139,7 +134,7 @@ FROM ACTIVITIES A
 JOIN COHORT C ON C.CUSTOMER_ID=A.CUSTOMER_ID
 GROUP BY C.COHORT_MONTH
 
-/*💬 CEO:
+/*
 "Build me the ULTIMATE customer intelligence report. Every metric, every customer."
 
 For ALL customers:
@@ -206,115 +201,6 @@ SELECT *,
         ELSE 'Low' END AS churn_risk	
 FROM FRM_SCORE
 ORDER BY MONETARY DESC NULLS LAST
-
-
-/* -------------------------------------------------------------------------------------------------------------------------------------------------------------
- =================================  P - R - A - C - T - I - C - E =====================================================================
- -------------------------------------------------------------------------------------------------------------------*/
-
- /*1. name, city
-2. recency_days — days since last delivered order (CURRENT_DATE - MAX(order_date)). No orders = 9999.
-3. frequency — count of delivered orders
-4. monetary — total delivered revenue (₹0 if none)
-5. r_score — NTILE(4) ORDER BY recency ASC (low = recent = best = score 1)
-6. f_score — NTILE(4) ORDER BY frequency DESC (high = frequent = best = score 1)
-7. m_score — NTILE(4) ORDER BY monetary DESC (high = big spender = best = score 1)
-8. rfm_segment — CASE-based label: Champions, Loyal, Big Spenders, At Risk, Lost, Needs Attention*/
-
-WITH RFM AS (
-SELECT
-	C.CUSTOMER_ID,
-	C.NAME,
-	C.CITY,
-	CURRENT_DATE - MAX(O.ORDER_DATE) AS recency_days,
-	COALESCE(COUNT(DISTINCT O.ORDER_ID),0)	AS frequency,
-	COALESCE(SUM(OI.QUANTITY*P.PRICE),0)	AS monetary
-FROM CUSTOMERS C
-LEFT JOIN ORDERS O ON C.CUSTOMER_ID=O.CUSTOMER_ID AND O.STATUS='Delivered'
-LEFT JOIN ORDER_ITEMS OI ON OI.ORDER_ID=O.ORDER_ID
-LEFT JOIN PRODUCTS P ON P.PRODUCT_ID=OI.PRODUCT_ID
-GROUP BY 1,2,3
-),
-RFM_SCORE AS (
-SELECT * , 
-	NTILE(4) OVER(ORDER BY recency_days) AS R_SCORE,
-	NTILE(4) OVER(ORDER BY frequency DESC) AS F_SCORE,
-	NTILE(4) OVER(ORDER BY monetary DESC) AS M_SCORE
-FROM RFM
-)
-SELECT *,
-	CASE 	
-		WHEN R_SCORE=1 AND F_SCORE=1 AND M_SCORE=1 THEN 'CHAMPION'
-		WHEN R_SCORE=1 AND F_SCORE=1 THEN 'LOYAL CUSTOMERS'
-		WHEN R_SCORE=1 AND M_SCORE=1 THEN 'BIG SPENDERS'
-		WHEN R_SCORE=3 AND F_SCORE=1 THEN 'AT RISK'
-		WHEN R_SCORE=4 AND F_SCORE=4 AND M_SCORE=4 THEN 'LOST'
-		WHEN F_SCORE=1 AND M_SCORE=1 THEN 'LOYAL BIG SPENDERS'
-		ELSE 'NEED ATTENTION'
-		END AS rfm_segment
-FROM RFM_SCORE 
-
-/*"Now show me a SUMMARY — how many customers are in each RFM segment, and what's each segment's total revenue 
-and average monetary value?"
-Group by rfm_segment. Show: segment, customer_count, total_revenue, avg_revenue, pct_of_customers. 
-Sort by total_revenue DESC.*/
-
-WITH RFM AS (
-SELECT
-	C.CUSTOMER_ID,
-	C.NAME,
-	C.CITY,
-	CURRENT_DATE - MAX(O.ORDER_DATE) AS recency_days,
-	COALESCE(COUNT(DISTINCT O.ORDER_ID),0)	AS frequency,
-	COALESCE(SUM(OI.QUANTITY*P.PRICE),0)	AS monetary
-FROM CUSTOMERS C
-LEFT JOIN ORDERS O ON C.CUSTOMER_ID=O.CUSTOMER_ID AND O.STATUS='Delivered'
-LEFT JOIN ORDER_ITEMS OI ON OI.ORDER_ID=O.ORDER_ID
-LEFT JOIN PRODUCTS P ON P.PRODUCT_ID=OI.PRODUCT_ID
-GROUP BY 1,2,3
-),
-RFM_SCORE AS (
-SELECT * , 
-	NTILE(4) OVER(ORDER BY recency_days) AS R_SCORE,
-	NTILE(4) OVER(ORDER BY frequency DESC) AS F_SCORE,
-	NTILE(4) OVER(ORDER BY monetary DESC) AS M_SCORE
-FROM RFM
-),
-RFM_SEGMENT AS (
-SELECT *,
-	CASE 	
-		WHEN R_SCORE=1 AND F_SCORE=1 AND M_SCORE=1 THEN 'CHAMPION'
-		WHEN R_SCORE=1 AND F_SCORE=1 THEN 'LOYAL CUSTOMERS'
-		WHEN R_SCORE=1 AND M_SCORE=1 THEN 'BIG SPENDERS'
-		WHEN R_SCORE=3 AND F_SCORE=1 THEN 'AT RISK'
-		WHEN R_SCORE=4 AND F_SCORE=4 AND M_SCORE=4 THEN 'LOST'
-		WHEN F_SCORE=1 AND M_SCORE=1 THEN 'LOYAL BIG SPENDERS'
-		ELSE 'NEED ATTENTION'
-		END AS rfm_segment
-FROM RFM_SCORE
-)
-SELECT 
-	rfm_segment, 
-	COUNT(DISTINCT CUSTOMER_ID) AS CUST_COUNT,
-	SUM(MONETARY) AS TOTAL_REV,
-	ROUND(AVG(MONETARY),2) AS AVG_REV,
-	ROUND(COUNT(*)::NUMERIC /SUM(COUNT(*)) OVER() * 100,2) AS pct_of_customers
-FROM RFM_SEGMENT
-GROUP BY 1
-ORDER BY 3 DESC
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
