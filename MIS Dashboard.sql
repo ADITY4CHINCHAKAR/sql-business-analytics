@@ -1,9 +1,4 @@
-/* DAY - 16 */
-
-/*💬 Priya:
-"Build me the complete monthly MIS report. ONE query. The CEO reviews this every month."
-For each month (delivered orders), show ALL of these in one query:
-
+/*
 1. month (Mon YYYY)
 2. revenue
 3. order_count
@@ -55,7 +50,7 @@ SELECT  MONTH, REVENUE, ORDER_COUNT, unique_customers,avg_order_value, rev_per_c
 	 LIMIT 1)T)AS best_product
 FROM MON_DATA2
 
-/*💬 Priya:
+/*
 "Now build a Product Performance Matrix. I want to see which products are stars, which are duds."
 For each product (delivered only):
 1. product_name, category
@@ -97,7 +92,7 @@ SELECT *,CASE
 FROM PRODUCT_RNK
 
 
-/*💬 Priya:
+/*
 "City-wise Quarterly Performance — for each city, for each quarter: revenue, orders, AOV, city's share of total, 
 and quarter-over-quarter growth per city."
 city, quarter_label, revenue, orders, aov, city_share_pct, prev_quarter_revenue (LAG PARTITION BY city), 
@@ -128,7 +123,7 @@ SELECT *,
 FROM CITY_D2
 
 
-/*💬 Priya:
+/*
 "Category cross-analysis: for each category, show revenue, units, average unit price, revenue rank, 
 and which city buys this category the MOST."
 Per category: category, revenue, units, avg_unit_price, rank, top_city (correlated subquery). Delivered only.*/
@@ -159,7 +154,7 @@ SELECT *,
 FROM PRODUCT_D
 
 
-/*💬 Priya:
+/*
 "Build the customer funnel. One query. Show each stage, count, and conversion rate from previous stage."
 Single query showing: stage_name, customer_count, pct_of_total, conversion_from_previous_stage.*/
 
@@ -186,7 +181,7 @@ SELECT *,
 	ROUND(CUSTOMER_COUNT::NUMERIC/LAG(CUSTOMER_COUNT) OVER(ORDER BY CUSTOMER_COUNT DESC)*100,1)	AS conversion_from_previous_stage
 FROM FUNNEL
 
-/*💬 CEO:
+/*
 "Give me ONE row with ALL the numbers I need. My executive KPI dashboard."
 Single row showing 12+ KPIs:
 total_revenue, total_orders, total_customers, active_customers, active_rate_pct, avg_order_value, top_city (by revenue)
