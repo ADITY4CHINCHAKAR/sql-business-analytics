@@ -1,7 +1,5 @@
-/* DAY - 14 BOSS ARENA */
 
-/*💬 CEO (Direct message!):
-"I want a monthly performance report. ONE query. Every metric I could possibly need."
+/*"I want a monthly performance report. ONE query. Every metric I could possibly need."
 For each month (delivered orders only), show ALL 14 columns:
 
 1. month — 'Mon YYYY' format
@@ -98,8 +96,7 @@ JOIN T_SPENDING TS2 ON TS2.CUSTOMER_ID=C2.CUSTOMER_ID
 ORDER BY C1.MON_ST
 
 
-/*💬 Priya:
-"Three questions in one go:"
+/*"Three questions in one go:"
 
 A) Which product categories are bought by Mumbai customers but NOT by Bangalore customers? (EXCEPT)
 B) Which customers have BOTH delivered AND cancelled orders? (INTERSECT)
@@ -168,8 +165,7 @@ JOIN PRODUCTS P on P.PRODUCT_ID=OI.PRODUCT_ID
 ORDER BY 4
 
 
-/*💬 Priya:
-"ONE query. A complete data audit dashboard showing:"
+/*"ONE query. A complete data audit dashboard showing:"
 
 1. total_customers / active / inactive
 2. total_orders / delivered / cancelled / shipped / orphan_orders
@@ -213,8 +209,8 @@ SELECT
 FROM EMPLOYEES) AS DATA_QUALITY_PCT
 
 
-/*💬 CEO:
-"Aditya, show me EVERYTHING about our customers. One query. If this is good, you're getting promoted."
+/*
+"EVERYTHING about our customers. One query. If this is good, you're getting promoted."
 For EVERY customer (even those with no orders):
 
 1. customer_code — 'CUST-001' format (LPAD)
@@ -292,14 +288,6 @@ SELECT
         WHEN CURRENT_DATE-LATEST_ORDER>60 THEN 'Medium'
         ELSE 'Low' END AS churn_risk
 FROM CD CD
-
-
-
-
-/*-------------------------------------------------------------------------------------------------------------------------------------------
-					PRACTICE REEEEEEEEEEEEEE PRACTICEEEEEEE......!!!!
-------------------------------------------------------------------------------------------------------------------------------------------------*/
-
 
 
 
